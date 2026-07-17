@@ -19,7 +19,8 @@ Date: July 2026
 '''
 
 import argparse
-import os, sys
+import os
+import sys
 
 def parse_command_args() -> object:
     "Set up argparse here. Call this function inside main."
@@ -44,14 +45,16 @@ def parse_command_args() -> object:
         nargs='?', 
         help="if a program is specified, show memory use of all associated processes. Show only total use if not."
     )
-    args = parser.parse_args()
+    # Using parse_known_args() ensures that when checkA2.py runs unit tests 
+    # passing extra arguments (like 'TestParseArgs'), argparse won't crash with an unrecognized argument error.
+    args, unknown = parser.parse_known_args()
     return args
 
 def percent_to_graph(percent: float, length: int=20) -> str:
     "turns a percent 0.0 - 1.0 into a bar graph"
     num_hashes = int(round(percent * length))
     num_spaces = length - num_hashes
-    return f"[{'#' * num_hashes}{' ' * num_spaces}]"
+    return f"{'#' * num_hashes}{' ' * num_spaces}"
 
 def get_sys_mem() -> int:
     "return total system memory (used or available) in kB"
@@ -113,15 +116,15 @@ if __name__ == "__main__":
     sys_percent = used_mem / total_mem if total_mem > 0 else 0.0
 
     if not args.program:  
-        graph = percent_to_graph(sys_percent, args.length)
+        raw_bar = percent_to_graph(sys_percent, args.length)
         percent_label = f"{int(round(sys_percent * 100))}%"
         
         if args.human_readable:
             total_str = bytes_to_human_r(total_mem)
             used_str = bytes_to_human_r(used_mem)
-            print(f"Memory         {graph[:-1]} | {percent_label}] {used_str}/{total_str}")
+            print(f"Memory         [{raw_bar} | {percent_label}] {used_str}/{total_str}")
         else:
-            print(f"Memory         {graph[:-1]} | {percent_label}] {used_mem}/{total_mem}")
+            print(f"Memory         [{raw_bar} | {percent_label}] {used_mem}/{total_mem}")
             
     else:
         pids = pids_of_prog(args.program)
@@ -137,23 +140,23 @@ if __name__ == "__main__":
             total_pid_rss += pid_rss
             
             pid_percent = pid_rss / total_mem if total_mem > 0 else 0.0
-            pid_graph = percent_to_graph(pid_percent, args.length)
+            pid_bar = percent_to_graph(pid_percent, args.length)
             pid_percent_label = f"{int(round(pid_percent * 100))}%"
             
             if args.human_readable:
                 pid_rss_str = bytes_to_human_r(pid_rss)
                 total_str = bytes_to_human_r(total_mem)
-                print(f"{pid:<14} {pid_graph[:-1]} | {pid_percent_label}] {pid_rss_str}/{total_str}")
+                print(f"{pid:<14} [{pid_bar} | {pid_percent_label}] {pid_rss_str}/{total_str}")
             else:
-                print(f"{pid:<14} {pid_graph[:-1]} | {pid_percent_label}] {pid_rss}/{total_mem}")
+                print(f"{pid:<14} [{pid_bar} | {pid_percent_label}] {pid_rss}/{total_mem}")
                 
         prog_percent = total_pid_rss / total_mem if total_mem > 0 else 0.0
-        prog_graph = percent_to_graph(prog_percent, args.length)
+        prog_bar = percent_to_graph(prog_percent, args.length)
         prog_percent_label = f"{int(round(prog_percent * 100))}%"
         
         if args.human_readable:
             total_pid_rss_str = bytes_to_human_r(total_pid_rss)
             total_str = bytes_to_human_r(total_mem)
-            print(f"{args.program:<14} {prog_graph[:-1]} | {prog_percent_label}] {total_pid_rss_str}/{total_str}")
+            print(f"{args.program:<14} [{prog_bar} | {prog_percent_label}] {total_pid_rss_str}/{total_str}")
         else:
-            print(f"{args.program:<14} {prog_graph[:-1]} | {prog_percent_label}] {total_pid_rss}/{total_mem}")
+            print(f"{args.program:<14} [{prog_bar} | {prog_percent_label}] {total_pid_rss}/{total_mem}")
