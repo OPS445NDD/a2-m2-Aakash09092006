@@ -3,7 +3,7 @@
 '''
 OPS445 Assignment 2 - Summer 2026
 Program: assignment2.py 
-Author: "Student Name"
+Author: "Ana56"
 The python code in this file is original work written by
 "Student Name". No code in this file is copied from any other source 
 except those provided by the course instructor, including any person, 
