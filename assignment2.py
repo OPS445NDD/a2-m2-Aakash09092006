@@ -2,7 +2,7 @@
 
 '''
 OPS445 Assignment 2 - Summer 2026
-Program: ana56 
+Program: assignment2.py 
 Author: "Student Name"
 The python code in this file is original work written by
 "Student Name". No code in this file is copied from any other source 
@@ -19,8 +19,7 @@ Date: July 2026
 '''
 
 import argparse
-import os
-import sys
+import os, sys
 
 def parse_command_args() -> object:
     "Set up argparse here. Call this function inside main."
@@ -79,7 +78,7 @@ def get_avail_mem() -> int:
 def pids_of_prog(app_name: str) -> list:
     "given an app name, return all pids associated with app"
     output = os.popen('pidof ' + app_name).read().strip()
-    if output == '':
+    if not output:
         return []
     return output.split()
 
